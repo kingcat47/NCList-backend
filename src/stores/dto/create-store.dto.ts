@@ -7,8 +7,9 @@ export class CreateStoreDto {
   @IsString()
   location: string;
 
+  @IsOptional()
   @IsEnum(['영업중', '곧마감', '마감'])
-  status: '영업중' | '곧마감' | '마감';
+  status?: '영업중' | '곧마감' | '마감'; // ✅ optional 처리
 
   @IsString()
   hours: string;
@@ -19,4 +20,4 @@ export class CreateStoreDto {
   @IsOptional()
   @IsString()
   originalUrl?: string;
-} 
+}

@@ -6,11 +6,11 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { StoresModule } from './stores/stores.module';
 
-import { GptModule } from './gpt/gpt.module'; // ✅ GPT 모듈로 교체
+import { FirecrawlModule } from './gpt/firecrawl.module'; // ✅ GPT 모듈로 교체
 
 import { typeOrmConfig } from './configs/typeorm.config';
 import vonageConfig from './configs/vonage.config';
-import gptConfig from './configs/gpt.config';
+import gptConfig from './configs/firecrawl.config';
 
 import { AppController } from './app.controller';
 
@@ -25,7 +25,7 @@ import { AppController } from './app.controller';
     AuthModule,
     UsersModule,
     StoresModule,
-    GptModule,
+    FirecrawlModule,
   ],
   controllers: [AppController],
 })
