@@ -45,6 +45,7 @@ export class FirecrawlService {
     const jsonOptions = {
       prompt: `
 다음 네이버 지도 장소 HTML 콘텐츠에서 아래 형식의 JSON으로 정보를 추출하세요.
+ 
 클로링한 정보중에 이모티콘이 많다면 이모티콘들은 무시하세요.헬스장과 같은 지점에서 꾸미기 위해 많이 사용합니다.
 
 조건:
@@ -63,13 +64,18 @@ export class FirecrawlService {
 - 숙박
 - 기타
 
-예시 JSON:
+원하는 응답 형식JSON:
 {
-"name": "버거킹",
-"location": "강남역",
-"hours": "10:00 - 22:00",
-"category": "음식점"
+"name": "",
+"location": "",
+"hours": "",
+"category": ""
 }
+
+크롤링 후에는 다음과 같은 조건들을 확인해보고 JSON을 주세요
+
+만약 크롤링 결과가 아래 조건들을 만족 시키기 어렵다면 최대한 확실한 정보로 추론해서 값을 넣고 카테고리를 기타로 분류하세요.
+만약 마지막에 가서도 정말 모르겠는경우는 다시 해당사이트를 크롤링해서 데이터를 가져오세요.
 `.trim(),
       schema: jsonSchema,
     };
