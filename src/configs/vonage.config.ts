@@ -12,12 +12,12 @@ import { registerAs } from '@nestjs/config';
  * - this.configService.get('vonage.fromNumber')
  */
 export default registerAs('vonage', () => ({
-  // Vonage API 키 (환경 변수에서 가져오거나 기본값 사용)
+
   apiKey: process.env.VONAGE_API_KEY || '',
-  // Vonage API 시크릿 (환경 변수에서 가져오거나 기본값 사용)
+
   apiSecret: process.env.VONAGE_API_SECRET || '',
-  // 발신자 전화번호 (환경 변수에서 가져오거나 기본값 사용)
+
   fromNumber: process.env.VONAGE_FROM_NUMBER || '',
-  // SMS 서비스 활성화 여부 (환경 변수에서 가져오거나 기본값 false)
+
   enabled: process.env.VONAGE_ENABLED === 'true' || false,
 })); 

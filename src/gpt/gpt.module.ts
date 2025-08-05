@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { GptController } from './gpt.controller';
 import { GPTService } from './gpt.service';
-import { StoresModule } from '../stores/stores.module'; // ✅ 추가
+import { StoresModule } from '../stores/stores.module';
 
 @Module({
-  imports: [StoresModule], // ✅ 여기 추가
+  imports: [StoresModule],
   controllers: [GptController],
   providers: [GPTService],
 })
