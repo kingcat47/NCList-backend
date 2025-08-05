@@ -12,8 +12,8 @@ export class Store {
   @Column()
   location: string;
 
-  @Column()
-  status: '영업중' | '곧마감' | '마감';
+  // @Column()
+  // status: '영업중' | '곧마감' | '마감';
 
   @Column()
   hours: string;
