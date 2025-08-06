@@ -13,12 +13,19 @@ export class FirecrawlController {
 
   @Post('extract-store-info')
   async extractStoreInfo(
-      @Body() body: { text: string; resolvedUrl: string },
+      @Body() body: { text: string; textWithoutUrl?: string; resolvedUrl: string },
       @Request() req,
   ) {
     const userId = req.user.id;
 
-    const storeInfo = await this.firecrawlService.extractStoreInfoFromUrl(body.resolvedUrl);
+    // textWithoutUrl 값 없으면 빈 문자열 처리 (안 넣으면 prompt에 아무 내용 없으므로)
+    const referenceText = body.textWithoutUrl ?? '';
+
+    // service 호출 시 두번째 인자로 참고 텍스트 전달
+    const storeInfo = await this.firecrawlService.extractStoreInfoFromUrl(
+        body.resolvedUrl,
+        referenceText,
+    );
 
     const saved = await this.storesService.create(
         {

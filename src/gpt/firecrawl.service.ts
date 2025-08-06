@@ -25,8 +25,13 @@ export class FirecrawlService {
     this.apiKey = apiKey;
   }
 
-  async extractStoreInfoFromUrl(resolvedUrl: string): Promise<StoreInfo> {
-    // Firecrawl API가 인식하는 순수 JSON Schema 객체
+  /**
+   * 네이버 지도 공유 텍스트에서 링크 제외한 참고용 텍스트를 받아
+   * 해당 텍스트를 AI 추출 prompt에 포함시켜 JSON 추출 정확도를 높임
+   * @param resolvedUrl 네이버 지도 장소 URL (크롤링 대상)
+   * @param referenceText 링크 제외한 참고 텍스트 (예: 매장명, 주소 등)
+   */
+  async extractStoreInfoFromUrl(resolvedUrl: string, referenceText: string): Promise<StoreInfo> {
     const jsonSchema = {
       type: 'object',
       properties: {
@@ -42,48 +47,33 @@ export class FirecrawlService {
       additionalProperties: false,
     };
 
-    const jsonOptions = {
-      prompt: `
+    // Prompt에 referenceText(링크 제외한 텍스트) 포함
+    const prompt = `
 다음 네이버 지도 장소 HTML 콘텐츠에서 아래 형식의 JSON으로 정보를 추출하세요.
- 
-클로링한 정보중에 이모티콘이 많다면 이모티콘들은 무시하세요.헬스장과 같은 지점에서 꾸미기 위해 많이 사용합니다.
+
+추가 참고 텍스트(링크 제외한 입력값):
+${referenceText}
+
+크롤링한 정보 중 이모티콘이 많다면 이모티콘들은 무시하세요. 헬스장과 같은 지점에서 꾸미기 위해 많이 사용합니다.
+만약 크롤링 결과가 아래 조건들을 만족시키기 어렵다면 최대한 확실한 정보로 추론해서 값을 넣고 카테고리를 기타로 분류하세요.
+만약 마지막에 가서도 정말 모르겠으면 "정보없음"으로 채우세요.
 
 조건:
-- JSON은 반드시 key가 "name", "location", "hours", "category"로 구성되어야 합니다.
-- "name"은 매장 이름만, 지역명/지점명은 제거 (예: "버거킹 강남역점" → "버거킹")
+- JSON key는 반드시 "name", "location", "hours", "category"로 구성
+- "name"은 매장 이름만, 지역명/지점명 제거 (예: "버거킹 강남역점" → "버거킹")
 - "location"은 지역 정보로, 주소에서 동, 역, 지명 등 최대 6자
-- "hours"는 영업 시간 (예: "10:00 - 22:00", "09:00 - 20:00", "07:00 - 24:00", "09:00 - 18:00", "10:00 - 20:00", "11:00 - 22:00", "12:00 - 21:00", "08:00 - 17:00", "11:30 - 21:30", "10:00 - 23:00", "09:00 - 22:00", "08:00 - 20:00", "12:00 - 00:00", "07:00 - 19:00", "06:00 - 23:00", "05:30 - 00:00", "00:00 - 24:00", "09:00 - 01:00", "07:00 - 22:00", "09:00 - 13:00", "14:00 - 18:00", "09:30 - 20:30", "10:00 - 16:00", "08:30 - 19:00", "15:00 - 11:00", "16:00 - 12:00", "07:00 - 03:00", "10:00 - 02:00" 등등)
-   만약 휴일이나 휴무와 같은 경우 시간대신 "휴무"라고 적어주세요.
-   만약 24시간 영업등의 텍스트로 채워져 있다면 "24시간 영업"이라고 적어주세요.
-   만약 영업시간 정보가 없거나 음식점,카페,헬스장,의료,숙박이 아닌 기타로 분류되는 건물인것 같다면 시간 정보는 "정보 없음"이라고 적어주세요.
-- "category"는 아래 중 가장 알맞은 하나만:
-- 음식점
-- 카페
-- 헬스장
-- 의료
-- 숙박
-- 기타
-
-원하는 응답 형식JSON:
-{
-"name": "",
-"location": "",
-"hours": "",
-"category": ""
-}
-
-크롤링 후에는 다음과 같은 조건들을 확인해보고 JSON을 주세요
-
-만약 크롤링 결과가 아래 조건들을 만족 시키기 어렵다면 최대한 확실한 정보로 추론해서 값을 넣고 카테고리를 기타로 분류하세요.
-만약 마지막에 가서도 정말 모르겠는경우는 다시 해당사이트를 크롤링해서 데이터를 가져오세요.
-`.trim(),
-      schema: jsonSchema,
-    };
+- "hours"는 영업 시간 (예: "10:00 - 22:00", "09:00 - 20:00", "07:00 - 24:00" 등등)
+  휴일/휴무면 "휴무", 24시간 영업이면 "00:00 - 24:00", 그 외 기타는 "정보 없음"으로 기입
+- "category"는 "음식점", "카페", "헬스장", "의료", "숙박", "기타" 중 하나
+  `.trim();
 
     const requestBody = {
       url: resolvedUrl,
       formats: ['json'],
-      jsonOptions,
+      jsonOptions: {
+        prompt,
+        schema: jsonSchema,
+      },
       onlyMainContent: true,
       timeout: 60000,
     };
@@ -99,16 +89,16 @@ export class FirecrawlService {
 
       console.log('Firecrawl 응답 전체:', JSON.stringify(response.data, null, 2));
 
-      const json = response.data?.data?.json;
-      if (!json) {
+      const extractedJson = response.data?.data?.json;
+      if (!extractedJson) {
         throw new Error('Firecrawl 응답에 추출 결과가 없습니다.');
       }
 
       return {
-        name: json.name,
-        location: json.location,
-        hours: json.hours,
-        category: json.category,
+        name: extractedJson.name,
+        location: extractedJson.location,
+        hours: extractedJson.hours,
+        category: extractedJson.category,
         originalUrl: resolvedUrl,
       };
     } catch (error) {
@@ -123,6 +113,7 @@ export class FirecrawlService {
     }
   }
 
+  // HTML 크롤링용 함수, 필요시 사용
   public async crawlNaverMap(url: string): Promise<string> {
     const requestBody = {
       url,
