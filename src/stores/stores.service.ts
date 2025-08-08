@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Store } from './entities/store.entity';
-import { CreateStoreDto } from './dto/create-store.dto';
+import {CreateStoreDto} from './dto/create-store.dto';
 
 @Injectable()
 export class StoresService {
@@ -13,8 +13,18 @@ export class StoresService {
 
   async create(createStoreDto: CreateStoreDto, userId: string): Promise<Store> {
     const store = this.storesRepository.create({
-      ...createStoreDto,
-      userId: userId
+      userId: userId,
+        name: createStoreDto.name,
+        location: createStoreDto.location,
+        monday: createStoreDto.monday,
+        tuesday: createStoreDto.tuesday,
+        wednesday: createStoreDto.wednesday,
+        thursday: createStoreDto.thursday,
+        friday: createStoreDto.friday,
+        saturday: createStoreDto.saturday,
+        sunday: createStoreDto.sunday,
+        link: createStoreDto.link,
+        category: createStoreDto.category,
     });
     return await this.storesRepository.save(store);
   }
@@ -38,7 +48,7 @@ export class StoresService {
     if (!store) {
       return false;
     }
-    
+
     await this.storesRepository.delete(id);
     return true;
   }

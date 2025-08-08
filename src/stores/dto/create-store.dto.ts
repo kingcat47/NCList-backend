@@ -1,23 +1,41 @@
-import { IsString, IsEnum, IsOptional } from 'class-validator';
+// src/stores/dto/create-store.dto.ts
+import { IsIn, IsOptional, IsString } from 'class-validator';
+import { Category } from '../entities/store.entity';
 
 export class CreateStoreDto {
-  @IsString()
-  name: string;
+    @IsString()
+    name: string;
 
-  @IsString()
-  location: string;
+    @IsString()
+    location: string;
 
-  @IsOptional()
-  @IsEnum(['영업중', '곧마감', '마감'])
-  status?: '영업중' | '곧마감' | '마감'; // ✅ optional 처리
+    @IsString()
+    monday: string;
 
-  @IsString()
-  hours: string;
+    @IsString()
+    tuesday: string;
 
-  @IsEnum(['음식점', '카페', '헬스장', '의료', '숙박', '기타'])
-  category: '음식점' | '카페' | '헬스장' | '의료' | '숙박' | '기타';
+    @IsString()
+    wednesday: string;
 
-  @IsOptional()
-  @IsString()
-  originalUrl?: string;
+    @IsString()
+    thursday: string;
+
+    @IsString()
+    friday: string;
+
+    @IsString()
+    saturday: string;
+
+    @IsString()
+    sunday: string;
+
+    @IsString()
+    @IsOptional()
+    link?: string;
+
+    @IsIn(['음식', '카페', '헬스', '의료', '숙박', '기타'], {
+        message: '카테고리는 음식, 카페, 헬스, 의료, 숙박, 기타 중 하나여야 합니다.',
+    })
+    category: Category;
 }

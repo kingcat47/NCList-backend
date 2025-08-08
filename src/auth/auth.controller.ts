@@ -15,7 +15,7 @@ export class AuthController {
   }
 
   @Post('verify-code')
-  @HttpCode(HttpStatus.OK) // 응답 상태 코드를 200으로 설정
+  @HttpCode(HttpStatus.OK)
   async verifyCode(@Body() loginDto: LoginDto) {
     return this.authService.verifyCode(loginDto);
   }
@@ -27,8 +27,8 @@ export class AuthController {
     return {
       message: '토큰이 유효합니다.',
       user: {
-        id: req.user.sub, // JWT payload의 sub (사용자 ID)
-        phoneNumber: req.user.phoneNumber, // JWT payload의 phoneNumber
+        id: req.user.sub,
+        phoneNumber: req.user.phoneNumber,
       },
     };
   }

@@ -32,14 +32,14 @@ export class StoresController {
   async findOne(@Param('id') id: string, @Request() req) {
     const userId = req.user.id;
     const store = await this.storesService.findOne(id, userId);
-    
+
     if (!store) {
       return {
         success: false,
         message: '가게 정보를 찾을 수 없습니다.'
       };
     }
-    
+
     return {
       success: true,
       data: store
@@ -50,14 +50,14 @@ export class StoresController {
   async remove(@Param('id') id: string, @Request() req) {
     const userId = req.user.id;
     const deleted = await this.storesService.remove(id, userId);
-    
+
     if (!deleted) {
       return {
         success: false,
         message: '가게 정보를 찾을 수 없습니다.'
       };
     }
-    
+
     return {
       success: true,
       message: '가게 정보가 삭제되었습니다.'

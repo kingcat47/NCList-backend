@@ -1,5 +1,15 @@
+// src/stores/entities/store.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+
+export enum Category {
+  음식 = '음식',
+  카페 = '카페',
+  헬스 = '헬스',
+  의료 = '의료',
+  숙박 = '숙박',
+  기타 = '기타',
+}
 
 @Entity('stores')
 export class Store {
@@ -12,23 +22,37 @@ export class Store {
   @Column()
   location: string;
 
-  // @Column()
-  // status: '영업중' | '곧마감' | '마감';
+  @Column()
+  monday: string;
 
   @Column()
-  hours: string;
+  tuesday: string;
 
   @Column()
-  category: '음식점' | '카페' | '헬스장' | '의료' | '숙박' | '기타';
+  wednesday: string;
 
-  @Column({ nullable: true })
-  originalUrl?: string;
+  @Column()
+  thursday: string;
 
-  // 사용자와의 관계 추가
+  @Column()
+  friday: string;
+
+  @Column()
+  saturday: string;
+
+  @Column()
+  sunday: string;
+
+  @Column()
+  category: Category;
+
+  @Column()
+  link: string;
+
   @Column({ name: 'user_id' })
   userId: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
-} 
+}

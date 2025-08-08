@@ -24,7 +24,6 @@ export class AuthService {
     
     // 6자리 랜덤 코드 생성 (100000 ~ 999999)
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    // 5분 후 만료 시간 설정
     // const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
@@ -87,7 +86,7 @@ export class AuthService {
         .catch(err => { 
           console.log('SMS 전송 중 오류 발생'); 
           console.error(err); 
-          throw err; // 에러를 다시 던져서 catch 블록으로 이동
+          throw err;
         });
 
         console.log(`SMS 전송 완료 - ${phoneNumber}: ${verificationCode}`);
