@@ -6,7 +6,7 @@ export default registerAs('vonage', () => ({
 
   apiSecret: process.env.VONAGE_API_SECRET || '',
 
-  // fromNumber: process.env.VONAGE_FROM_NUMBER || '',
+  fromNumber: process.env.VONAGE_FROM_NUMBER || '',
 
   enabled: process.env.VONAGE_ENABLED === 'true' || false,
 })); 
